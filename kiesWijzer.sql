@@ -31,6 +31,7 @@
 --------------------------------------------------------------------------------
 -- Automatisch gegenereerde zooi, voor het programma zie verder...
 --------------------------------------------------------------------------------
+\set ON_ERROR_STOP on
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
@@ -86,7 +87,7 @@ end;
 $$;
 
 
-ALTER FUNCTION public.add_question(choice_node_id bigint, yes_answer text, q_text text) OWNER TO postgres;
+ALTER FUNCTION add_question(choice_node_id bigint, yes_answer text, q_text text) OWNER TO postgres;
 
 
 -- zie boven. Excuses dat yes, no, en dontcare bijna kopieën zijn ;)
@@ -111,7 +112,7 @@ begin
 end;$$;
 
 
-ALTER FUNCTION public.dontcare(OUT q_type character, OUT next_question bigint, OUT next_text text, last_question bigint) OWNER TO postgres;
+ALTER FUNCTION dontcare(OUT q_type character, OUT next_question bigint, OUT next_text text, last_question bigint) OWNER TO postgres;
 
 -- De entropie wordt gebruikt om de kwaliteit van de vragen te bepalen.
 -- Vragen die op elkaar volgen door "dontcare" kunnen in willekeurige volgorde
@@ -132,7 +133,7 @@ end if	;
 	end;$$;
 
 
-ALTER FUNCTION public.entropy(count integer, denominator integer) OWNER TO postgres;
+ALTER FUNCTION entropy(count integer, denominator integer) OWNER TO postgres;
 
 
 CREATE FUNCTION no(OUT q_type character, OUT next_question bigint, OUT next_text text, last_question bigint) RETURNS record
@@ -155,7 +156,7 @@ begin
 end;$$;
 
 
-ALTER FUNCTION public.no(OUT q_type character, OUT next_question bigint, OUT next_text text, last_question bigint) OWNER TO postgres;
+ALTER FUNCTION no(OUT q_type character, OUT next_question bigint, OUT next_text text, last_question bigint) OWNER TO postgres;
 
 -- bepaalt de entropie op basis van de antwoorden (het aantal yes/no/dontcare)
 CREATE FUNCTION question_quality(yes integer, no integer, total integer) RETURNS real
@@ -165,7 +166,7 @@ CREATE FUNCTION question_quality(yes integer, no integer, total integer) RETURNS
 end;$$;
 
 
-ALTER FUNCTION public.question_quality(yes integer, no integer, total integer) OWNER TO postgres;
+ALTER FUNCTION question_quality(yes integer, no integer, total integer) OWNER TO postgres;
 
 -- Construeert uit de entropie, en het id een uniek veld. De entopie bepaalt de
 -- volgorde, het id zorgt er voor dat stellingen met gelijke entropie ook een
@@ -177,7 +178,7 @@ CREATE FUNCTION question_sorter(yes integer, no integer, total integer, question
 end;$$;
 
 
-ALTER FUNCTION public.question_sorter(yes integer, no integer, total integer, question_id bigint) OWNER TO postgres;
+ALTER FUNCTION question_sorter(yes integer, no integer, total integer, question_id bigint) OWNER TO postgres;
 
 -- De resultaten-maker. De parameters zijn alleen voor intern gebruik bedoeld.
 CREATE FUNCTION start(OUT q_type character, OUT question_id bigint, OUT question_txt text, node_id bigint DEFAULT 1, last_sorter text DEFAULT NULL::text) RETURNS record
@@ -202,7 +203,7 @@ CREATE FUNCTION start(OUT q_type character, OUT question_id bigint, OUT question
 end;$$;
 
 
-ALTER FUNCTION public.start(OUT q_type character, OUT question_id bigint, OUT question_txt text, node_id bigint, last_sorter text) OWNER TO postgres;
+ALTER FUNCTION start(OUT q_type character, OUT question_id bigint, OUT question_txt text, node_id bigint, last_sorter text) OWNER TO postgres;
 
 CREATE FUNCTION yes(OUT q_type character, OUT next_question bigint, OUT next_text text, last_question bigint) RETURNS record
     LANGUAGE plpgsql
@@ -224,7 +225,7 @@ begin
 end;$$;
 
 
-ALTER FUNCTION public.yes(OUT q_type character, OUT next_question bigint, OUT next_text text, last_question bigint) OWNER TO postgres;
+ALTER FUNCTION yes(OUT q_type character, OUT next_question bigint, OUT next_text text, last_question bigint) OWNER TO postgres;
 
 SET default_tablespace = '';
 
@@ -359,15 +360,4 @@ ALTER TABLE ONLY question
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --
 
-REVOKE ALL ON SCHEMA public FROM PUBLIC;
-REVOKE ALL ON SCHEMA public FROM postgres;
-GRANT ALL ON SCHEMA public TO postgres;
-GRANT ALL ON SCHEMA public TO PUBLIC;
-
-
--- Completed on 2016-02-04 14:54:20
-
---
--- PostgreSQL database dump complete
---
 
