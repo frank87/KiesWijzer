@@ -121,6 +121,10 @@ func dontcare( w http.ResponseWriter, id string ) {
     checkErr(err)
     rows, err := stmnt.Query( id )
     defer rows.Close()
+
+    stmnt, err = db.Prepare( "update question set ( count_total ) = ( count_total +1) where id = $1" )
+    _, err = stmnt.Exec(id)
+    checkErr(err)
     if rows.Next() {
     	var next_id string
 	var sorter string
