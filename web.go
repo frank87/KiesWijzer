@@ -117,14 +117,16 @@ func dontcare( w http.ResponseWriter, id string ) {
     defer db.Close()
     checkErr(err)
     
-    stmnt, err := db.Prepare("select choice_node, sorter from question_select where id = $1;")
+    stmnt, err := db.Prepare( "update question set ( count_total ) = ( count_total +1) where id = $1" )
+    checkErr(err)
+    _, err = stmnt.Exec(id)
+    checkErr(err)
+
+    stmnt, err = db.Prepare("select choice_node, sorter from question_select where id = $1;")
     checkErr(err)
     rows, err := stmnt.Query( id )
     defer rows.Close()
 
-    stmnt, err = db.Prepare( "update question set ( count_total ) = ( count_total +1) where id = $1" )
-    _, err = stmnt.Exec(id)
-    checkErr(err)
     if rows.Next() {
     	var next_id string
 	var sorter string
