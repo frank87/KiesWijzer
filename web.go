@@ -4,6 +4,7 @@ import (
     "strconv"
     "fmt"
     "net/http"
+    "html"
     "strings"
     "log"
     "database/sql"
@@ -159,7 +160,7 @@ func response(w http.ResponseWriter, r *http.Request) {
 	newQuestion( w, i, s[3] )
     } else if s[1] == "addQuestion" {
 	i, _ := strconv.Atoi(s[2])
-	addQuestion( w, i, s[3], r.FormValue("body") )
+	addQuestion( w, i, s[3], html.EscapeString( r.FormValue("body") ) )
     } else {
     	start(w)
     }
