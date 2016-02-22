@@ -12,7 +12,7 @@ import (
     //_ "github.com/lxn/go-pgsql"
 )
 
-var answers = []string{ "stem niet", "stem voor", "stem tegen" }
+var answers = []string{ "stem niet", "stem voor", "stem tegen", "stem blanco" }
 
 func selectQuestion( w http.ResponseWriter, db *sql.DB, id string, criteria string ) {
     stmnt, err := db.Prepare("select id, text from question_select where choice_node = $1 and " + criteria + " order by sorter desc;" )
@@ -95,7 +95,7 @@ func start( w http.ResponseWriter ) {
 
 func newQuestion( w http.ResponseWriter, answer int, id string ) {
     fmt.Fprintf(w, "Geef een stelling die anderen zal overtuigen om ook \"%s\" te kiezen<br>", answers[answer] )
-    fmt.Fprintf(w, "<form action=\"/addQuestion/%d/%s\" method=\"POST\"><div><textarea name=\"body\" rows=\"5\" cols=\"80\">x</textarea></div><div><input type=\"submit\" value=\"Save\"></div></form>", answer, id);
+    fmt.Fprintf(w, "<form action=\"/addQuestion/%d/%s\" method=\"POST\"><div><textarea name=\"body\" rows=\"5\" cols=\"80\"> </textarea></div><div><input type=\"submit\" value=\"Save\"></div></form>", answer, id);
     fmt.Fprintf(w, "</body>")
 }
 

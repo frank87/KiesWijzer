@@ -290,7 +290,6 @@ CREATE VIEW question_select AS
  SELECT question.choice_node,
     question.id,
     question.text,
-    question_sorter(question.count_yes, question.count_no, question.count_total, question.id) AS quality,
     question_sorter(question.count_yes, question.count_no, question.count_total, question.id) AS sorter
    FROM question
   ORDER BY (question_sorter(question.count_yes, question.count_no, question.count_total, question.id)) DESC;
