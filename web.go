@@ -17,7 +17,8 @@ var answers = []string{ "stem niet", "stem voor", "stem tegen", "stem blanco" }
 var stdHeader = "Wat vindt u van de volgende stelling"
 var startHeader = `Welkom bij de kieswijzer voor het referendum van 6 april.
 In tegenstelling tot de meeste andere kieswijzers zijn de stellingen hier door
-andere gebruikers ingebracht. Wij zouden het ook erg leuk vinden als u een stelling
+andere gebruikers ingebracht en uw keuzes beinvloeden de volgende stellingen 
+die u te zien krijgt. Wij zouden het ook erg leuk vinden als u een stelling
 verzint als de uitkomst iets anders is als u zelf had verwacht. Stellingen waar
 veel mensen geen mening over hebben, hebben minder kans om geselecteerd te worden. Wat vindt u van de eerste stelling:`
 
