@@ -13,14 +13,27 @@ import (
     //_ "github.com/lxn/go-pgsql"
 )
 
-var answers = []string{ "stem niet", "stem voor", "stem tegen", "stem blanco" }
+var answers = []string{ "stem niet",
+			"VVD",
+			"PvdA",
+			"PVV",
+			"D66",
+			"SP",
+			"CDA",
+			"GroenLinks",
+			"CU",
+			"SGP",
+			"VNL",
+			"PvdD",
+			"PPNL",
+			"50plus" } 
 var stdHeader = "Wat vindt u van de volgende stelling"
-var startHeader = `Welkom bij de kieswijzer voor het referendum van 6 april.
-In tegenstelling tot de meeste andere kieswijzers zijn de stellingen hier door
-andere gebruikers ingebracht en uw keuzes beinvloeden de volgende stellingen 
-die u te zien krijgt. Wij zouden het ook erg leuk vinden als u een stelling
-verzint als de uitkomst iets anders is als u zelf had verwacht. Stellingen waar
-veel mensen geen mening over hebben, hebben minder kans om geselecteerd te worden. Wat vindt u van de eerste stelling:`
+var startHeader = `Welkom bij de kieswijzer voor de Tweede Kamerverkiezingen
+die voor 17 maart 2017 gepland staan.
+In tegenstelling tot de meeste andere kieswijzers zijn de getoonde stellingen 
+afhankelijk van uw eerdere antwoorden. De kieswijzer probeert te leren van fout
+adviezen. Wij zouden het ook erg leuk vinden als u een stelling
+verzint als de uitkomst iets anders is als u zelf had verwacht.`
 
 var questionPage = `{{.Header}}
 <table border="1">
@@ -79,7 +92,6 @@ func selectQuestion( w http.ResponseWriter, db *sql.DB, id string, criteria stri
 	var qtext string
 	err := rows.Scan( &qid, &qtext )
 	checkErr(err)
-	db.Exec("COMMIT");
 	questionOut( w, qHeader, qtext, qid )
     } else {
     	stmnt, err := db.Prepare("select id, answer_text from choice_node where id = $1;" )
@@ -92,7 +104,7 @@ func selectQuestion( w http.ResponseWriter, db *sql.DB, id string, criteria stri
 	    var atext string
 	    rows.Scan( &aid, &atext )
 	    fmt.Fprintf(w, "<body><table>")
-	    fmt.Fprintf(w, "<tr><th>Wij geven het advies voor het referendum van 6 april: %s</th></tr>", atext )
+	    fmt.Fprintf(w, "<tr><th>Wij geven het advies voor de volgende Tweede Kamerverkiezingen: %s</th></tr>", atext )
 	    fmt.Fprintf(w, "<tr><td><a href=\"/start\">Fantastisch, ik wil nog eens</a></td></tr>");
 	    for i, text := range answers {
 	    	if text != atext {
@@ -105,6 +117,7 @@ func selectQuestion( w http.ResponseWriter, db *sql.DB, id string, criteria stri
 	    fmt.Fprintf(w, "Daar is iets fout</body>");
 	}
     }
+    db.Exec("COMMIT");
 } 
 
 
@@ -132,6 +145,7 @@ func yesno( w http.ResponseWriter, t string, id string ) {
 	fmt.Fprintf(w, "Ongeldige waarde")
 	fmt.Fprintf(w, "</body>" )
     }
+    db.Exec("commit")
 }
 
 func start( w http.ResponseWriter ) {
@@ -144,6 +158,8 @@ func start( w http.ResponseWriter ) {
 }    
 
 func newQuestion( w http.ResponseWriter, answer int, id string ) {
+    
+    questionList(id, w );
     t,err := template.New("Question page").Parse(pleaseNewQuestion)
     checkErr(err);
     d:=NewQuestion{ AnswerText: answers[answer], AnswerNum: strconv.Itoa(answer), Id: id }
@@ -188,6 +204,7 @@ func dontcare( w http.ResponseWriter, id string ) {
     } else {
     	fmt.Fprintf(w, "Duuhhh</body>" )
     }
+    db.Exec("commit")
 }
     
 
@@ -220,6 +237,42 @@ func checkErr(err error) {
     if err != nil {
         panic(err)
     }
+}
+
+func checkErr2(err error, text string) {
+    if err != nil {
+        panic(text)
+    }
+}
+
+func questionList(id string, w http.ResponseWriter) {
+    fmt.Fprintf(w, "Uw antwoorden:" );
+    fmt.Fprintf(w, "<table><tr><th>stelling</th><th><antwoord</th></tr>");
+    db, err := sql.Open("postgres", "dbname=kiesWijzer")
+    defer db.Close()
+    checkErr(err)
+
+    stmnt, err := db.Prepare("select choice_node, text, 'eens' from question where on_yes= $1 union select choice_node, text, 'oneens' from question where on_no = $1;" );
+    // checkErr2(err, "SQL klopt niet!!!" )
+    checkErr(err)
+    
+    for ( true ) {
+	rows,err := stmnt.Query(id)
+	defer rows.Close()
+	checkErr(err)
+	if rows.Next() {
+            var qid string
+	    var qtext string
+	    var qanswer string
+	    err := rows.Scan( &qid, &qtext, &qanswer )
+	    checkErr(err)
+	    fmt.Fprintf(w, "<tr><td>%s</td><td>%s</td></tr>", qtext, qanswer );
+	    id=qid;
+        } else { break; }
+    }
+
+    fmt.Fprintf(w,"</table>");
+
 }
 
 func main() {
