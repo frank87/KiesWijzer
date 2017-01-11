@@ -49,8 +49,8 @@ var answers = []string{ "stem niet",
 			"Buurt Partij",
 			"HHH Partij",
 			"Artikel 1",
-			"NIEUWE WEGEN"
-} 
+			"NIEUWE WEGEN" } 
+
 var stdHeader = "Wat vindt u van de volgende stelling"
 var startHeader = `Welkom bij de kieswijzer voor de Tweede Kamerverkiezingen
 die voor 15 maart 2017 gepland staan.
