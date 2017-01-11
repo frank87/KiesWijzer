@@ -25,11 +25,18 @@ var answers = []string{ "stem niet",
 			"SGP",
 			"VNL",
 			"PvdD",
-			"PPNL",
+			"Piratenpartij",
+			"GeenPeil",
+			"DENK",
+			"Vrijzinnige Partij",
+			"Libertarische Partij",
+			"VNL",
+			"Foum voor Democratie",
+			"Nieuwe Wegen",
 			"50plus" } 
 var stdHeader = "Wat vindt u van de volgende stelling"
 var startHeader = `Welkom bij de kieswijzer voor de Tweede Kamerverkiezingen
-die voor 17 maart 2017 gepland staan.
+die voor 15 maart 2017 gepland staan.
 In tegenstelling tot de meeste andere kieswijzers zijn de getoonde stellingen 
 afhankelijk van uw eerdere antwoorden. De kieswijzer probeert te leren van fout
 adviezen. Wij zouden het ook erg leuk vinden als u een stelling
