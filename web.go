@@ -33,7 +33,24 @@ var answers = []string{ "stem niet",
 			"VNL",
 			"Foum voor Democratie",
 			"Nieuwe Wegen",
-			"50plus" } 
+			"Niet Stemmers",
+			"Het Gezonde Verstand (HGV)",
+			"OndernemersPartij",
+			"NieuwMidden2015",
+			"Lokaal in de Kamer",
+			"StemNL",
+			"Integriteitspartij",
+			"STERK",
+			"Verantwoordelijk Bestuur",
+			"REFERENDAPARTIJ.NL",
+			"De Burger Beweging",
+			"Respect",
+			"Links Offensief",
+			"Buurt Partij",
+			"HHH Partij",
+			"Artikel 1",
+			"NIEUWE WEGEN"
+} 
 var stdHeader = "Wat vindt u van de volgende stelling"
 var startHeader = `Welkom bij de kieswijzer voor de Tweede Kamerverkiezingen
 die voor 15 maart 2017 gepland staan.
@@ -119,6 +136,7 @@ func selectQuestion( w http.ResponseWriter, db *sql.DB, id string, criteria stri
 		}
             }
 
+            fmt.Fprintf(w, "</table><a href=\"https://github.com/frank87/KiesWijzer.git/\">source</a></body>")
             fmt.Fprintf(w, "</table></body>")
 	} else {
 	    fmt.Fprintf(w, "Daar is iets fout</body>");
