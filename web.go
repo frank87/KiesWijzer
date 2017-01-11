@@ -136,8 +136,8 @@ func selectQuestion( w http.ResponseWriter, db *sql.DB, id string, criteria stri
 		}
             }
 
-            fmt.Fprintf(w, "</table><a href=\"https://github.com/frank87/KiesWijzer.git/\">source</a></body>")
-            fmt.Fprintf(w, "</table></body>")
+            fmt.Fprintf(w, "<tr><td></td><tr></table></b>Natuurlijk is dit open <a href=\"https://github.com/frank87/KiesWijzer.git/\">source</a>")
+            fmt.Fprintf(w, "</body>")
 	} else {
 	    fmt.Fprintf(w, "Daar is iets fout</body>");
 	}
