@@ -250,8 +250,9 @@ CREATE TABLE choice_node (
 ALTER TABLE choice_node OWNER TO postgres;
 
 
+-- Eerste 1000 zijn voor initiele vulling.
 CREATE SEQUENCE choice_node_seq
-    START WITH 1
+    START WITH 1000
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
@@ -261,8 +262,9 @@ CREATE SEQUENCE choice_node_seq
 ALTER TABLE choice_node_seq OWNER TO postgres;
 
 
+-- Eerste 1000 zijn voor initiele vulling.
 CREATE SEQUENCE question_id
-    START WITH 1
+    START WITH 1000
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
