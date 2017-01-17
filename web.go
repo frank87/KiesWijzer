@@ -13,8 +13,7 @@ import (
     //_ "github.com/lxn/go-pgsql"
 )
 
-var answers = []string{ "stem niet",
-			"VVD",
+var answers = []string{ "VVD",
 			"PvdA",
 			"PVV",
 			"D66",
@@ -55,7 +54,7 @@ var stdHeader = "Wat vindt u van de volgende stelling"
 var startHeader = `Welkom bij de kieswijzer voor de Tweede Kamerverkiezingen
 die voor 15 maart 2017 gepland staan.
 In tegenstelling tot de meeste andere kieswijzers zijn de getoonde stellingen 
-afhankelijk van uw eerdere antwoorden. De kieswijzer probeert te leren van fout
+afhankelijk van uw eerdere antwoorden. De kieswijzer probeert te leren van foute
 adviezen. Wij zouden het ook erg leuk vinden als u een stelling
 verzint als de uitkomst iets anders is als u zelf had verwacht.`
 
@@ -70,15 +69,15 @@ var questionPage = `{{.Header}}
 </table>`
 
 
-var pleaseNewQuestion = `De andere mensen die het met u eens waren over de gevraagde stellingen hadden de andere keuze gemaakt. Kunt u een stelling toevoegen die hen
-zal overtuigen "{{.AnswerText}}" te kiezen.
+var pleaseNewQuestion = `De andere mensen die het met u eens waren over de gevraagde stellingen hadden de andere keuze gemaakt. Kunt u een stelling toevoegen
+waarom u "{{.AnswerText}}" zou kiezen(Omdat u het <bf><em>eens</em></bf> bent met deze stelling)
 <form action="/addQuestion/{{.AnswerNum}}/{{.Id}}" method="POST">
    <div>
      <textarea name="body" rows="5" cols="80"> 
      </textarea>
    </div>
    <div>
-     <input type="submit" value="Save">
+     <input type="submit" value="indienen">
    </div>
 </form>`
 
@@ -105,6 +104,7 @@ func questionOut( w http.ResponseWriter, h string, q string, id string ) {
 
 func selectQuestion( w http.ResponseWriter, db *sql.DB, id string, criteria string, qHeader string ) {
     stmnt, err := db.Prepare("select id, text from question_select where choice_node = $1 and " + criteria + " order by sorter desc;" )
+    fmt.Println("select id, text from question_select where choice_node = $1 and " + criteria + " order by sorter desc; $1 ='"  + id + "'" )
     checkErr(err)
 
     rows,err := stmnt.Query(id)
@@ -153,19 +153,39 @@ func yesno( w http.ResponseWriter, t string, id string ) {
     checkErr(err)
     defer db.Close()
 
-    fmt.Println( "select on_" + t + " from question where id = $1" )
-    stmnt, err := db.Prepare( "select on_" + t + " from question where id = $1" )
+    stmnt, err := db.Prepare( "update question set ( count_"+t+", count_total) = ( count_"+t+" + 1, count_total +1) where id = $1" )
+    _ , err = stmnt.Exec(id)
+    checkErr(err)
+
+    stmnt, err = db.Prepare( "select on_" + t + ", choice_node from question where id = $1;" )
     checkErr(err)
     rows, err := stmnt.Query( id )
     defer rows.Close()
     checkErr(err)
     if rows.Next() {
 	var next_id string
-	rows.Scan(&next_id)
-	stmnt, err = db.Prepare( "update question set ( count_"+t+", count_total) = ( count_"+t+" + 1, count_total +1) where id = $1" )
-	_, err = stmnt.Exec(id)
-	checkErr(err)
-	selectQuestion( w, db, next_id, "1 = 1", stdHeader )
+	var this_id string
+	var sorter  string
+	err := rows.Scan(&next_id, &this_id)
+        checkErr(err)
+	
+	if next_id == this_id {
+	    stmnt, err = db.Prepare("select sorter from question_select where id = $1;")
+	    checkErr(err)
+	    rows, err := stmnt.Query( id )
+	    defer rows.Close()
+            checkErr(err)
+
+	    if rows.Next() {
+		rows.Scan( &sorter )
+		sorter = " sorter < '" + sorter + "'"
+             } else {
+	         sorter = " 1 = 1 "
+             }
+	} else {
+		sorter = " 1 = 1 "
+	}
+	selectQuestion( w, db, next_id, sorter, stdHeader )
     } else {
 	fmt.Fprintf(w, "Ongeldige waarde")
 	fmt.Fprintf(w, "</body>" )
@@ -229,6 +249,7 @@ func dontcare( w http.ResponseWriter, id string ) {
     } else {
     	fmt.Fprintf(w, "Duuhhh</body>" )
     }
+
     db.Exec("commit")
 }
     
@@ -277,7 +298,7 @@ func questionList(id string, w http.ResponseWriter) {
     defer db.Close()
     checkErr(err)
 
-    stmnt, err := db.Prepare("select choice_node, text, 'eens' from question where on_yes= $1 union select choice_node, text, 'oneens' from question where on_no = $1;" );
+    stmnt, err := db.Prepare("select choice_node, text, 'eens' from question where on_yes= $1  and choice_node < $1 union select choice_node, text, 'oneens' from question where on_no = $1 and choice_node < $1;" );
     // checkErr2(err, "SQL klopt niet!!!" )
     checkErr(err)
     

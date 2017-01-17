@@ -140,19 +140,25 @@ CREATE FUNCTION no(OUT q_type character, OUT next_question bigint, OUT next_text
     LANGUAGE plpgsql
     AS $$declare
 node_id bigint;
+no_id bigint;
+c_sorter text;
 begin
-	select on_no into node_id
-	from question
+	select on_no, choice_node, sorter into no_id, node_id, c_sorter
+	from question_select
 	where id = last_question;
 	if not found then
 		raise exception 'question % not found', last_question;
 	end if;
+	if no_id = node_id then
+		select start(node_id, c_sorter ) into q_type, next_question, next_text;
+	else
+		select start(no_id) into q_type, next_question, next_text;
+	end if;
 	update question
-	set ( count_no, count_total) =
-            ( count_no + 1, count_total +1)
+	set ( count_total, count_no ) =
+            ( count_total +1, count_no +1 )
 	where id = last_question;
-	select start(node_id) into q_type, next_question, next_text;
-	return;
+	return;	
 end;$$;
 
 
@@ -300,9 +306,16 @@ ALTER TABLE question_select OWNER TO postgres;
 -- initiele vulling: het antwoord als alle stellingen je niks kunnen schelen.
 COPY choice_node (id, answer_text) FROM stdin;
 1	stem niet
+2	GeenPeil
 \.
 
 
+COPY question ( text, on_yes, on_no, choice_node) FROM stdin;
+Als kiezer wil ik directe invloed bij beslissingen in de Tweede Kamer - mijn volksvertegenwoordiger zou precies moeten stemmen wat ik wil.	2	1	1
+Volksvertegenwoordigers moeten de regering veel meer dan nu nauwlettend controleren bij de uitvoering van haar taken.	2	1	1
+Het huidige model van vertegenwoordigende democratie voldoet niet meer aan de moderne eisen.	2	1	1
+ Politieke vertegenwoordiging zou meer gebruik moeten maken van beschikbare technische en digitale middelen om bestuur dichter bij de burger te brengen.	2	1	1
+\.
 --
 
 ALTER TABLE ONLY choice_node
