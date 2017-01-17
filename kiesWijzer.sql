@@ -307,14 +307,17 @@ ALTER TABLE question_select OWNER TO postgres;
 COPY choice_node (id, answer_text) FROM stdin;
 1	stem niet
 2	GeenPeil
+3	GeenPeil
+4	GeenPeil
+5	GeenPeil
 \.
 
 
 COPY question ( text, on_yes, on_no, choice_node) FROM stdin;
 Als kiezer wil ik directe invloed bij beslissingen in de Tweede Kamer - mijn volksvertegenwoordiger zou precies moeten stemmen wat ik wil.	2	1	1
-Volksvertegenwoordigers moeten de regering veel meer dan nu nauwlettend controleren bij de uitvoering van haar taken.	2	1	1
-Het huidige model van vertegenwoordigende democratie voldoet niet meer aan de moderne eisen.	2	1	1
- Politieke vertegenwoordiging zou meer gebruik moeten maken van beschikbare technische en digitale middelen om bestuur dichter bij de burger te brengen.	2	1	1
+Volksvertegenwoordigers moeten de regering veel meer dan nu nauwlettend controleren bij de uitvoering van haar taken.	3	1	1
+Het huidige model van vertegenwoordigende democratie voldoet niet meer aan de moderne eisen.	4	1	1
+ Politieke vertegenwoordiging zou meer gebruik moeten maken van beschikbare technische en digitale middelen om bestuur dichter bij de burger te brengen.	5	1	1
 \.
 --
 
