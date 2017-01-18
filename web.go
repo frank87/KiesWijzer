@@ -219,7 +219,7 @@ func addQuestion( w http.ResponseWriter, answer int, id string, tekst string ) {
 
     stmnt, err := db.Prepare("select add_question( $1, $2, $3 );")
     checkErr(err)
-    stmnt.Query(id, answers[answer], tekst )
+    _, err = stmnt.Query(id, answers[answer], tekst )
     checkErr(err)
     fmt.Fprintf(w, "Dank u.<a href=\"/start\">nog eens</a></body>" )
 
